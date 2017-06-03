@@ -947,6 +947,8 @@ public class IndexSBT implements Index {
                 x      = n;
                 n      = x.child(store, isleft);
 
+                x.setBalance(store, x.getBalance(store) + 1);
+
                 if (n == null) {
                     break;
                 }
@@ -2037,19 +2039,25 @@ public class IndexSBT implements Index {
     void leftRotate(PersistentStore store, NodeSBT x) {
         NodeSBT r = x.child(store, false);
         x = x.set(store, false, r.child(store, true));
+        x.replace(store, this, r);
         r = r.set(store, true, x);
         r.setBalance(store, x.getBalance(store));
-        x.setBalance(store, x.child(store, true).getBalance(store) + x.child(store, false).getBalance(store) + 1);
-        x.replace(store, this, r);
+        NodeSBT xl = x.child(store, true);
+        NodeSBT xr = x.child(store, false);
+        x.setBalance(store, (xl == null ? 0 : xl.getBalance(store)) + (xr == null ? 0 : xr.getBalance(store)) + 1);
+        // x.replace(store, this, r);
     }
 
     void rightRotate(PersistentStore store, NodeSBT x) {
         NodeSBT l = x.child(store, true);
         x = x.set(store, true, l.child(store, false));
+        x.replace(store, this, l);
         l = l.set(store, false, x);
         l.setBalance(store, x.getBalance(store));
-        x.setBalance(store, x.child(store, true).getBalance(store) + x.child(store, false).getBalance(store) + 1);
-        x.replace(store, this, l);
+        NodeSBT xl = x.child(store, true);
+        NodeSBT xr = x.child(store, false);
+        x.setBalance(store, (xl == null ? 0 : xl.getBalance(store)) + (xr == null ? 0 : xr.getBalance(store)) + 1);
+        // x.replace(store, this, l);
     }
 
     void subBalance(PersistentStore store, NodeSBT x, boolean isleft) {
