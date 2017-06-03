@@ -1,0 +1,9 @@
+/*C1*/SET SCHEMA SYSTEM_LOBS
+INSERT INTO BLOCKS VALUES(0,2147483647,0)
+COMMIT
+/*C2*/SET SCHEMA PUBLIC
+create cached table student(\u000aid int,\u000aname char(20),\u000aprimary key(id))
+INSERT INTO STUDENT VALUES(1,'a                   ')
+COMMIT
+INSERT INTO STUDENT VALUES(2,'b                   ')
+COMMIT
