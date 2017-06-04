@@ -75,7 +75,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.sun.org.apache.xml.internal.serializer.utils.SystemIDResolver;
 import org.hsqldb.Constraint;
 import org.hsqldb.HsqlNameManager.HsqlName;
 import org.hsqldb.OpTypes;
@@ -512,7 +511,7 @@ public class IndexSBT implements Index {
             StringBuffer s = new StringBuffer();
             s.append("count " + rowCount + " columns " + colIndex.length
                      + " selectivity " + changes[0]);
-            System.out.println(s);
+            //////System.out.println(s);
 */
             return changes;
         } finally {
@@ -1085,6 +1084,14 @@ public class IndexSBT implements Index {
 
             x.delete();
 
+            // after node x is deleted, we need to maintain the size of its ancestors
+            while (n != null) {
+                x = n;
+                x.setBalance(store, x.getBalance(store) - 1);
+                // isleft = x.isFromLeft(store);
+                n      = x.getParent(store);
+            }
+            /*
             while (n != null) {
                 x = n;
 
@@ -1146,6 +1153,7 @@ public class IndexSBT implements Index {
                 isleft = x.isFromLeft(store);
                 n      = x.getParent(store);
             }
+            */
         } catch (RuntimeException e) {
             throw e;
         } finally {
@@ -1926,48 +1934,30 @@ public class IndexSBT implements Index {
 
         NodeSBT l = x.child(store, true);
         NodeSBT r = x.child(store, false);
-        if (l != null) {
-            System.out.println("l is not null");
-        }
-        if (r != null) {
-            System.out.println("r is not null");
-            if (r.child(store, true) != null) {
-                System.out.println("r's left is not null");
-            }
-            if (r.child(store, false) != null) {
-                System.out.println("r's right is not null");
-            }
-        }
         if (r != null && r.child(store, true) != null && (l == null || r.child(store, true).getBalance(store) > l.getBalance(store))) {
-            System.out.println("ThanLeft, return 1");
+            // System.out.println("ThanLeft, return 1");
             return 1;
         }
         if (r != null && r.child(store, false) != null && (l == null || r.child(store, false).getBalance(store) > l.getBalance(store))) {
-            System.out.println("ThanLeft, return 2");
+            // System.out.println("ThanLeft, return 2");
             return 2;
         }
-        System.out.println("ThanLeft, return 0");
+        // System.out.println("ThanLeft, return 0");
         return 0;
     }
 
     int largeThanRightChild(PersistentStore store, NodeSBT x) {
         NodeSBT l = x.child(store, true);
         NodeSBT r = x.child(store, false);
-        if (l != null) {
-            System.out.println("l is not null");
-        }
-        if (r != null) {
-            System.out.println("r is not null");
-        }
         if (l != null && l.child(store, true) != null && (r == null || l.child(store, true).getBalance(store) > r.getBalance(store))) {
-            System.out.println("ThanRight, return 1");
+            // System.out.println("ThanRight, return 1");
             return 1;
         }
         if (l != null && l.child(store, false) != null && (r == null || l.child(store, false).getBalance(store) > r.getBalance(store))) {
-            System.out.println("ThanRight, return 2");
+            // System.out.println("ThanRight, return 2");
             return 2;
         }
-        System.out.println("ThanRight, return 0");
+        // System.out.println("ThanRight, return 0");
         return 0;
     }
 
@@ -1980,7 +1970,6 @@ public class IndexSBT implements Index {
         NodeSBT xl = x.child(store, true);
         NodeSBT xr = x.child(store, false);
         x.setBalance(store, (xl == null ? 0 : (xl.getBalance(store) + 1)) + (xr == null ? 0 : (xr.getBalance(store) + 1)));
-        // x.replace(store, this, r);
     }
 
     void rightRotate(PersistentStore store, NodeSBT x) {
@@ -1992,25 +1981,22 @@ public class IndexSBT implements Index {
         NodeSBT xl = x.child(store, true);
         NodeSBT xr = x.child(store, false);
         x.setBalance(store, (xl == null ? 0 : (xl.getBalance(store) + 1)) + (xr == null ? 0 : (xr.getBalance(store) + 1)));
-        // x.replace(store, this, l);
     }
 
+    /* balance subtree whose root node is x */
     void subBalance(PersistentStore store, NodeSBT x, boolean isleft) {
         if (x == null) {
             return;
         }
-        System.out.println("Now balancing");
         if (isleft) {
             // the altered subtree is x's left subtree
             switch (largeThanRightChild(store, x)) {
                 case 1 :
                     // left.left > right
-                    System.out.println("left.left > right");
                     rightRotate(store, x);
                     break;
                 case 2:
                     // left.right > right
-                    System.out.println("left.right > left");
                     leftRotate(store, x.child(store, true));
                     rightRotate(store, x);
                     break;
@@ -2023,13 +2009,11 @@ public class IndexSBT implements Index {
             switch (largeThanLeftChild(store, x)) {
                 case 1:
                     // right.left > left
-                    System.out.println("right.left > left");
                     rightRotate(store, x.child(store, false));
                     leftRotate(store, x);
                     break;
                 case 2:
                     // right.right > left
-                    System.out.println("right.right > left");
                     leftRotate(store, x);
                     break;
                 case 0:
@@ -2041,6 +2025,7 @@ public class IndexSBT implements Index {
         subBalance(store, x.child(store, false), false);
         subBalance(store, x, true);
         subBalance(store, x, false);
+        return;
     }
 
     /**
