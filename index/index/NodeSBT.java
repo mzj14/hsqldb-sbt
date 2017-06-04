@@ -99,11 +99,9 @@ import org.hsqldb.rowio.RowInputInterface;
  * @version 1.9.0
  * @since Hypersonic SQL
  */
-
 public class NodeSBT implements CachedObject {
 
     static final int NO_POS = RowSBTDisk.NO_POS;
-    // ibalance here is related to size
     public int       iBalance;
     public NodeSBT   nNext;    // node of next index (nNext==null || nNext.iId=iId+1)
 
@@ -115,14 +113,10 @@ public class NodeSBT implements CachedObject {
 
     NodeSBT() {
         row = null;
-        iBalance = 0;
-        nLeft    = nRight = nParent = null;
     }
 
     public NodeSBT(Row r) {
         row = r;
-        iBalance = 0;
-        nLeft    = nRight = nParent = null;
     }
 
     public void delete() {
@@ -285,6 +279,7 @@ public class NodeSBT implements CachedObject {
     public boolean isKeepInMemory() {
         return false;
     }
+    ;
 
     public boolean keepInMemory(boolean keep) {
         return true;

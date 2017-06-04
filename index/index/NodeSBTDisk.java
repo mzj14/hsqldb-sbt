@@ -101,7 +101,6 @@ import org.hsqldb.rowio.RowOutputInterface;
  * @version 2.2.9
  * @since Hypersonic SQL
  */
-
 public class NodeSBTDisk extends NodeSBT {
 
     final RowSBTDisk row;
@@ -564,4 +563,3 @@ public class NodeSBTDisk extends NodeSBT {
         return false;
     }
 }
-

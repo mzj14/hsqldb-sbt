@@ -123,8 +123,8 @@ import javax.xml.soap.Node;
 public class IndexSBT implements Index {
 
     private static final IndexRowIterator emptyIterator =
-        new IndexRowIterator(null, (PersistentStore) null, null, null, 0,
-                             false, false);
+            new IndexRowIterator(null, (PersistentStore) null, null, null, 0,
+                    false, false);
 
     // fields
     private final long       persistenceId;
@@ -180,9 +180,9 @@ public class IndexSBT implements Index {
         this.colIndex      = columns;
         this.colTypes      = colTypes;
         this.colDesc       = descending == null ? new boolean[columns.length]
-                                                : descending;
+                : descending;
         this.nullsLast     = nullsLast == null ? new boolean[columns.length]
-                                               : nullsLast;
+                : nullsLast;
         this.isPK          = pk;
         this.isUnique      = unique;
         this.isConstraint  = constraint;
@@ -377,8 +377,8 @@ public class IndexSBT implements Index {
 
         if (isConstraint) {
             return isForward ? 4
-                             : isUnique ? 0
-                                        : 1;
+                    : isUnique ? 0
+                    : 1;
         } else {
             return 2;
         }
@@ -473,7 +473,7 @@ public class IndexSBT implements Index {
                 }
 
                 compareRowForChange(session, node.getData(store),
-                                    temp.getData(store), changes);
+                        temp.getData(store), changes);
 
                 node = temp;
 
@@ -483,7 +483,7 @@ public class IndexSBT implements Index {
             if (probeDeeper) {
                 double[] factors = new double[colIndex.length];
                 int extras = probeFactor(session, store, factors, true)
-                             + probeFactor(session, store, factors, false);
+                        + probeFactor(session, store, factors, false);
 
                 for (int i = 0; i < colIndex.length; i++) {
                     factors[i] /= 2;
@@ -510,7 +510,6 @@ public class IndexSBT implements Index {
 
 /*
             StringBuffer s = new StringBuffer();
-
             s.append("count " + rowCount + " columns " + colIndex.length
                      + " selectivity " + changes[0]);
             System.out.println(s);
@@ -535,13 +534,13 @@ public class IndexSBT implements Index {
         while (n != null) {
             x = n;
             n = left ? x.getLeft(store)
-                     : x.getRight(store);
+                    : x.getRight(store);
 
             depth++;
 
             if (depth > probeDepth && n != null) {
                 compareRowForChange(session, x.getData(store),
-                                    n.getData(store), changes);
+                        n.getData(store), changes);
             }
         }
 
@@ -715,7 +714,7 @@ public class IndexSBT implements Index {
 
         for (int j = 0; j < fieldcount; j++) {
             int i = colTypes[j].compare(session, a[colIndex[j]],
-                                        b[rowColMap[j]]);
+                    b[rowColMap[j]]);
 
             if (i != 0) {
                 return i;
@@ -730,7 +729,7 @@ public class IndexSBT implements Index {
 
         for (int j = 0; j < fieldCount; j++) {
             int i = colTypes[j].compare(session, a[colIndex[j]],
-                                        b[rowColMap[j]]);
+                    b[rowColMap[j]]);
 
             if (i != 0) {
                 return i;
@@ -748,7 +747,7 @@ public class IndexSBT implements Index {
 
         for (int j = 0; j < fieldCount; j++) {
             int i = colTypes[j].compare(session, a[colIndex[j]],
-                                        b[colIndex[j]]);
+                    b[colIndex[j]]);
 
             if (i != 0) {
                 return i;
@@ -763,7 +762,7 @@ public class IndexSBT implements Index {
 
         for (int j = 0; j < colIndex.length; j++) {
             int i = colTypes[j].compare(session, a[colIndex[j]],
-                                        b[colIndex[j]]);
+                    b[colIndex[j]]);
 
             if (i != 0) {
                 for (; j < colIndex.length; j++) {
@@ -777,7 +776,7 @@ public class IndexSBT implements Index {
 
         for (int j = 0; j < colIndex.length; j++) {
             int i = colTypes[j].compare(session, a[colIndex[j]],
-                                        b[colIndex[j]]);
+                    b[colIndex[j]]);
 
             if (i != 0) {
                 if (isSimpleOrder) {
@@ -785,7 +784,7 @@ public class IndexSBT implements Index {
                 }
 
                 boolean nulls = a[colIndex[j]] == null
-                                || b[colIndex[j]] == null;
+                        || b[colIndex[j]] == null;
 
                 if (colDesc[j] && !nulls) {
                     i = -i;
@@ -822,7 +821,7 @@ public class IndexSBT implements Index {
 
         for (int j = start; j < colIndex.length; j++) {
             int i = colTypes[j].compare(session, a[colIndex[j]],
-                                        b[colIndex[j]]);
+                    b[colIndex[j]]);
 
             if (i != 0) {
                 if (isSimpleOrder) {
@@ -830,7 +829,7 @@ public class IndexSBT implements Index {
                 }
 
                 boolean nulls = a[colIndex[j]] == null
-                                || b[colIndex[j]] == null;
+                        || b[colIndex[j]] == null;
 
                 if (colDesc[j] && !nulls) {
                     i = -i;
@@ -848,8 +847,8 @@ public class IndexSBT implements Index {
             long diff = newRow.getPos() - existingRow.getPos();
 
             return diff == 0L ? 0
-                              : diff > 0L ? 1
-                                          : -1;
+                    : diff > 0L ? 1
+                    : -1;
         }
 
         return 0;
@@ -858,7 +857,7 @@ public class IndexSBT implements Index {
     int compareObject(Session session, Object[] a, Object[] b,
                       int[] rowColMap, int position, int opType) {
         return colTypes[position].compare(session, a[colIndex[position]],
-                                          b[rowColMap[position]], opType);
+                b[rowColMap[position]], opType);
     }
 
     boolean hasNulls(Session session, Object[] rowData) {
@@ -868,7 +867,7 @@ public class IndexSBT implements Index {
         }
 
         boolean normal = session == null ? true
-                                         : session.database.sqlUniqueNulls;
+                : session.database.sqlUniqueNulls;
 
         for (int j = 0; j < colIndex.length; j++) {
             if (rowData[colIndex[j]] == null) {
@@ -913,8 +912,8 @@ public class IndexSBT implements Index {
                 Row currentRow = n.getRow(store);
 
                 compare = compareRowForInsertOrDelete(session, row,
-                                                      currentRow,
-                                                      compareRowId, 0);
+                        currentRow,
+                        compareRowId, 0);
 
                 // after the first match and check, all compares are with row id
                 if (compare == 0 && session != null && !compareRowId
@@ -922,9 +921,9 @@ public class IndexSBT implements Index {
                     if (!isEqualReadable(session, store, n)) {
                         compareRowId = true;
                         compare = compareRowForInsertOrDelete(session, row,
-                                                              currentRow,
-                                                              compareRowId,
-                                                              colIndex.length);
+                                currentRow,
+                                compareRowId,
+                                colIndex.length);
                     }
                 }
 
@@ -937,7 +936,7 @@ public class IndexSBT implements Index {
 
                     if (c == null) {
                         throw Error.error(ErrorCode.X_23505,
-                                          name.statementName);
+                                name.statementName);
                     } else {
                         throw c.getException(row.getData());
                     }
@@ -1090,7 +1089,7 @@ public class IndexSBT implements Index {
                 x = n;
 
                 int sign = isleft ? 1
-                                  : -1;
+                        : -1;
 
                 switch (x.getBalance(store) * sign) {
 
@@ -1136,9 +1135,9 @@ public class IndexSBT implements Index {
                             x = x.set(store, !isleft, l.child(store, isleft));
                             l = l.set(store, isleft, x);
                             x = x.setBalance(store, (b == sign) ? -sign
-                                                                : 0);
+                                    : 0);
                             r = r.setBalance(store, (b == -sign) ? sign
-                                                                 : 0);
+                                    : 0);
                             l = l.setBalance(store, 0);
                             x = l;
                         }
@@ -1159,8 +1158,8 @@ public class IndexSBT implements Index {
                                 Object[] rowdata, int[] rowColMap) {
 
         NodeSBT node = findNode(session, store, rowdata, rowColMap,
-                                rowColMap.length, OpTypes.EQUAL,
-                                TransactionManager.ACTION_REF, false);
+                rowColMap.length, OpTypes.EQUAL,
+                TransactionManager.ACTION_REF, false);
 
         return node != null;
     }
@@ -1188,15 +1187,15 @@ public class IndexSBT implements Index {
         }
 
         NodeSBT node = findNode(session, store, rowdata, defaultColMap,
-                                matchCount, compareType,
-                                TransactionManager.ACTION_READ, reversed);
+                matchCount, compareType,
+                TransactionManager.ACTION_READ, reversed);
 
         if (node == null) {
             return emptyIterator;
         }
 
         return new IndexRowIterator(session, store, this, node, distinctCount,
-                                    false, reversed);
+                false, reversed);
     }
 
     /**
@@ -1212,15 +1211,15 @@ public class IndexSBT implements Index {
                                     Object[] rowdata) {
 
         NodeSBT node = findNode(session, store, rowdata, colIndex,
-                                colIndex.length, OpTypes.EQUAL,
-                                TransactionManager.ACTION_READ, false);
+                colIndex.length, OpTypes.EQUAL,
+                TransactionManager.ACTION_READ, false);
 
         if (node == null) {
             return emptyIterator;
         }
 
         return new IndexRowIterator(session, store, this, node, 0, false,
-                                    false);
+                false);
     }
 
     /**
@@ -1237,15 +1236,15 @@ public class IndexSBT implements Index {
                                     Object[] rowdata, int[] rowColMap) {
 
         NodeSBT node = findNode(session, store, rowdata, rowColMap,
-                                rowColMap.length, OpTypes.EQUAL,
-                                TransactionManager.ACTION_READ, false);
+                rowColMap.length, OpTypes.EQUAL,
+                TransactionManager.ACTION_READ, false);
 
         if (node == null) {
             return emptyIterator;
         }
 
         return new IndexRowIterator(session, store, this, node, 0, false,
-                                    false);
+                false);
     }
 
     /**
@@ -1257,15 +1256,15 @@ public class IndexSBT implements Index {
                                            PersistentStore store) {
 
         NodeSBT node = findNode(session, store, nullData, this.defaultColMap,
-                                1, OpTypes.NOT,
-                                TransactionManager.ACTION_READ, false);
+                1, OpTypes.NOT,
+                TransactionManager.ACTION_READ, false);
 
         if (node == null) {
             return emptyIterator;
         }
 
         return new IndexRowIterator(session, store, this, node, 0, false,
-                                    false);
+                false);
     }
 
     /**
@@ -1304,7 +1303,7 @@ public class IndexSBT implements Index {
             }
 
             return new IndexRowIterator(session, store, this, x,
-                                        distinctCount, false, false);
+                    distinctCount, false, false);
         } finally {
             readLock.unlock();
         }
@@ -1369,7 +1368,7 @@ public class IndexSBT implements Index {
             }
 
             return new IndexRowIterator(session, store, this, x,
-                                        distinctCount, false, true);
+                    distinctCount, false, true);
         } finally {
             readLock.unlock();
         }
@@ -1481,14 +1480,14 @@ public class IndexSBT implements Index {
                  int[] depths) {
 
         NodeSBT temp = depth == maxDepth ? null
-                                         : x.getRight(store);
+                : x.getRight(store);
 
         if (temp != null) {
             depth++;
 
             x    = temp;
             temp = depth == maxDepth ? null
-                                     : x.getLeft(store);
+                    : x.getLeft(store);
 
             while (temp != null) {
                 depth++;
@@ -1572,8 +1571,8 @@ public class IndexSBT implements Index {
         session.database.txManager.setTransactionInfo(store, row);
 
         if (session.database.txManager.canRead(session, store, row,
-                                               TransactionManager.ACTION_DUP,
-                                               null)) {
+                TransactionManager.ACTION_DUP,
+                null)) {
             return true;
         }
 
@@ -1676,7 +1675,7 @@ public class IndexSBT implements Index {
 
                 if (fieldCount > 0) {
                     i = compareRowNonUnique(session, currentRow.getData(),
-                                            rowdata, rowColMap, fieldCount);
+                            rowdata, rowColMap, fieldCount);
                 }
 
                 if (i == 0) {
@@ -1697,8 +1696,8 @@ public class IndexSBT implements Index {
                         case OpTypes.NOT :
                         case OpTypes.GREATER : {
                             i = compareObject(session, currentRow.getData(),
-                                              rowdata, rowColMap, fieldCount,
-                                              compareType);
+                                    rowdata, rowColMap, fieldCount,
+                                    compareType);
 
                             if (i <= 0) {
                                 n = x.getRight(store);
@@ -1712,8 +1711,8 @@ public class IndexSBT implements Index {
                         case OpTypes.GREATER_EQUAL_PRE :
                         case OpTypes.GREATER_EQUAL : {
                             i = compareObject(session, currentRow.getData(),
-                                              rowdata, rowColMap, fieldCount,
-                                              compareType);
+                                    rowdata, rowColMap, fieldCount,
+                                    compareType);
 
                             if (i < 0) {
                                 n = x.getRight(store);
@@ -1726,8 +1725,8 @@ public class IndexSBT implements Index {
                         }
                         case OpTypes.SMALLER : {
                             i = compareObject(session, currentRow.getData(),
-                                              rowdata, rowColMap, fieldCount,
-                                              compareType);
+                                    rowdata, rowColMap, fieldCount,
+                                    compareType);
 
                             if (i < 0) {
                                 result = x;
@@ -1740,8 +1739,8 @@ public class IndexSBT implements Index {
                         }
                         case OpTypes.SMALLER_EQUAL : {
                             i = compareObject(session, currentRow.getData(),
-                                              rowdata, rowColMap, fieldCount,
-                                              compareType);
+                                    rowdata, rowColMap, fieldCount,
+                                    compareType);
 
                             if (i <= 0) {
                                 result = x;
@@ -1777,13 +1776,13 @@ public class IndexSBT implements Index {
                 currentRow = result.getRow(store);
 
                 if (session.database.txManager.canRead(session, store,
-                                                       currentRow, readMode,
-                                                       colIndex)) {
+                        currentRow, readMode,
+                        colIndex)) {
                     break;
                 }
 
                 result = reversed ? last(store, result)
-                                  : next(store, result);
+                        : next(store, result);
 
                 if (result == null) {
                     break;
@@ -1793,8 +1792,8 @@ public class IndexSBT implements Index {
 
                 if (fieldCount > 0
                         && compareRowNonUnique(
-                            session, currentRow.getData(), rowdata, rowColMap,
-                            fieldCount) != 0) {
+                        session, currentRow.getData(), rowdata, rowColMap,
+                        fieldCount) != 0) {
                     result = null;
 
                     break;
@@ -1825,7 +1824,7 @@ public class IndexSBT implements Index {
                 int i = 0;
 
                 i = compareRowNonUnique(session, currentRow.getData(),
-                                        rowData, colIndex, fieldCount);
+                        rowData, colIndex, fieldCount);
 
                 if (reversed) {
                     if (i < 0) {
@@ -1865,7 +1864,7 @@ public class IndexSBT implements Index {
                 }
 
                 result = reversed ? last(store, result)
-                                  : next(store, result);
+                        : next(store, result);
             }
 
             return result;
@@ -1879,59 +1878,44 @@ public class IndexSBT implements Index {
      */
     /*
     void balance(PersistentStore store, NodeSBT x, boolean isleft) {
-
         while (true) {
             int sign = isleft ? 1
                               : -1;
-
             switch (x.getBalance(store) * sign) {
-
                 case 1 :
                     x = x.setBalance(store, 0);
-
                     return;
-
                 case 0 :
                     x = x.setBalance(store, -sign);
                     break;
-
                 case -1 :
                     NodeSBT l = x.child(store, isleft);
-
                     // LL or RR
                     if (l.getBalance(store) == -sign) {
                         x.replace(store, this, l);
-
                         x = x.set(store, isleft, l.child(store, !isleft));
                         l = l.set(store, !isleft, x);
                         x = x.setBalance(store, 0);
                         l = l.setBalance(store, 0);
                     } else {
                         NodeSBT r = l.child(store, !isleft);
-
                         x.replace(store, this, r);
-
                         l = l.set(store, !isleft, r.child(store, isleft));
                         r = r.set(store, isleft, l);
                         x = x.set(store, isleft, r.child(store, !isleft));
                         r = r.set(store, !isleft, x);
-
                         int rb = r.getBalance(store);
-
                         x = x.setBalance(store, (rb == -sign) ? sign
                                                               : 0);
                         l = l.setBalance(store, (rb == sign) ? -sign
                                                              : 0);
                         r = r.setBalance(store, 0);
                     }
-
                     return;
             }
-
             if (x.isRoot(store)) {
                 return;
             }
-
             isleft = x.isFromLeft(store);
             x      = x.getParent(store);
         }
@@ -1995,7 +1979,7 @@ public class IndexSBT implements Index {
         r.setBalance(store, x.getBalance(store));
         NodeSBT xl = x.child(store, true);
         NodeSBT xr = x.child(store, false);
-        x.setBalance(store, (xl == null ? 0 : xl.getBalance(store)) + (xr == null ? 0 : xr.getBalance(store)));
+        x.setBalance(store, (xl == null ? 0 : (xl.getBalance(store) + 1)) + (xr == null ? 0 : (xr.getBalance(store) + 1)));
         // x.replace(store, this, r);
     }
 
@@ -2007,7 +1991,7 @@ public class IndexSBT implements Index {
         l.setBalance(store, x.getBalance(store));
         NodeSBT xl = x.child(store, true);
         NodeSBT xr = x.child(store, false);
-        x.setBalance(store, (xl == null ? 0 : xl.getBalance(store)) + (xr == null ? 0 : xr.getBalance(store)));
+        x.setBalance(store, (xl == null ? 0 : (xl.getBalance(store) + 1)) + (xr == null ? 0 : (xr.getBalance(store) + 1)));
         // x.replace(store, this, l);
     }
 
@@ -2090,7 +2074,7 @@ public class IndexSBT implements Index {
             return emptyIterator;
         } else {
             IndexRowIterator it = new IndexRowIterator(session, store, this,
-                x, 0, single, reversed);
+                    x, 0, single, reversed);
 
             return it;
         }
@@ -2152,10 +2136,10 @@ public class IndexSBT implements Index {
                 try {
                     if (reversed) {
                         nextnode = index.last(session, store, nextnode,
-                                              distinctCount);
+                                distinctCount);
                     } else {
                         nextnode = index.next(session, store, nextnode,
-                                              distinctCount);
+                                distinctCount);
                     }
                 } finally {
                     store.writeUnlock();
@@ -2173,7 +2157,7 @@ public class IndexSBT implements Index {
             Row row = getNextRow();
 
             return row == null ? null
-                               : row.getData();
+                    : row.getData();
         }
 
         public void removeCurrent() {
