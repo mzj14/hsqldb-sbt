@@ -365,6 +365,7 @@ public class IndexSBTMemory extends IndexSBT {
 
             x.delete();
 
+            /*
             while (n != null) {
                 x = n;
 
@@ -427,6 +428,13 @@ public class IndexSBTMemory extends IndexSBT {
 
                 isleft = x.isFromLeft(store);
                 n      = x.nParent;
+            }
+            */
+            while (n != null) {
+                x = n;
+                x.setBalance(store, x.getBalance(store) - 1);
+                // isleft = x.isFromLeft(store);
+                n      = x.getParent(store);
             }
         } finally {
             writeLock.unlock();
@@ -498,6 +506,7 @@ public class IndexSBTMemory extends IndexSBT {
     /**
      * Balances part of the tree after an alteration to the index.
      */
+    /*
     void balance(PersistentStore store, NodeSBT x, boolean isleft) {
 
         while (true) {
@@ -556,4 +565,118 @@ public class IndexSBTMemory extends IndexSBT {
             x      = x.nParent;
         }
     }
+    */
+    /**
+     * To judge whether subtree with root node x is balanced
+     */
+    int largeThanLeftChild(PersistentStore store, NodeSBT x) {
+        NodeSBT l = x.child(store, true);
+        NodeSBT r = x.child(store, false);
+        if (r != null && r.child(store, true) != null && (l == null || r.child(store, true).getBalance(store) > l.getBalance(store))) return 1;
+        if (r != null && r.child(store, false) != null && (l == null || r.child(store, false).getBalance(store) > l.getBalance(store))) return 2;
+        return 0;
+    }
+
+    /**
+     * To judge whether subtree with root node x is balanced
+     */
+    int largeThanRightChild(PersistentStore store, NodeSBT x) {
+        NodeSBT l = x.child(store, true);
+        NodeSBT r = x.child(store, false);
+        if (l != null && l.child(store, true) != null && (r == null || l.child(store, true).getBalance(store) > r.getBalance(store))) return 1;
+        if (l != null && l.child(store, false) != null && (r == null || l.child(store, false).getBalance(store) > r.getBalance(store))) return 2;
+        return 0;
+    }
+
+    /**
+     * left rotation for balancing sbt
+     */
+    void leftRotate(PersistentStore store, NodeSBT x) {
+        NodeSBT r = x.child(store, false);
+        x = x.set(store, false, r.child(store, true));
+        x.replace(store, this, r);
+        r = r.set(store, true, x);
+        r.setBalance(store, x.getBalance(store));
+        NodeSBT xl = x.child(store, true);
+        NodeSBT xr = x.child(store, false);
+        x.setBalance(store, (xl == null ? 0 : (xl.getBalance(store) + 1)) + (xr == null ? 0 : (xr.getBalance(store) + 1)));
+    }
+
+    /**
+     *  right rotation for balancing sbt
+     */
+    void rightRotate(PersistentStore store, NodeSBT x) {
+        NodeSBT l = x.child(store, true);
+        x = x.set(store, true, l.child(store, false));
+        x.replace(store, this, l);
+        l = l.set(store, false, x);
+        l.setBalance(store, x.getBalance(store));
+        NodeSBT xl = x.child(store, true);
+        NodeSBT xr = x.child(store, false);
+        x.setBalance(store, (xl == null ? 0 : (xl.getBalance(store) + 1)) + (xr == null ? 0 : (xr.getBalance(store) + 1)));
+    }
+
+    /**
+     *  Balance subtree whose root node is x
+     */
+    void subBalance(PersistentStore store, NodeSBT x, boolean isleft) {
+        if (x == null) {
+            return;
+        }
+        if (isleft) {
+            // the altered subtree is x's left subtree
+            switch (largeThanRightChild(store, x)) {
+                case 1 :
+                    // left.left > right
+                    rightRotate(store, x);
+                    break;
+                case 2:
+                    // left.right > right
+                    leftRotate(store, x.child(store, true));
+                    rightRotate(store, x);
+                    break;
+                case 0:
+                    // no need to rotate
+                    return;
+            }
+        } else {
+            // the altered subtree is x's right subtree
+            switch (largeThanLeftChild(store, x)) {
+                case 1:
+                    // right.left > left
+                    rightRotate(store, x.child(store, false));
+                    leftRotate(store, x);
+                    break;
+                case 2:
+                    // right.right > left
+                    leftRotate(store, x);
+                    break;
+                case 0:
+                    // no need to rotate
+                    return;
+            }
+        }
+        subBalance(store, x.child(store, true), true);
+        subBalance(store, x.child(store, false), false);
+        subBalance(store, x, true);
+        subBalance(store, x, false);
+    }
+
+    /**
+     * Balance the subtree whose root is node x, the newly inserted node is in the isleft subtree
+     */
+    void balance(PersistentStore store, NodeSBT x, boolean isleft) {
+        while (true) {
+
+            subBalance(store, x, isleft);
+
+            if (x.isRoot(store)) {
+                return;
+            }
+
+            isleft = x.isFromLeft(store);
+            x      = x.getParent(store);
+        }
+    }
 }
+
